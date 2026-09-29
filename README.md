@@ -485,4 +485,819 @@ outputs/checkpoint.json
 - 故障排查
 - 查看中间结果
 
-暂
+暂未实现自动断点续跑。
+
+---
+
+## 7. Human Reference Validation
+
+`human_ref.json` 只有：
+
+```text
+human_reference
+annotator_notes
+```
+
+没有：
+
+```text
+人工数值分数
+pass / fail
+gold label
+```
+
+因此不能合理计算：
+
+- Pearson
+- Spearman
+- MAE
+- Precision
+- Recall
+- F1
+- Accuracy
+
+项目没有人为制造这些标签。
+
+---
+
+### 7.1 定性一致性审计
+
+API 评分结束后，再发起独立审计请求。
+
+输入包括：
+
+```text
+原始问题
+自动回复
+自动评分及理由
+human_reference
+annotator_notes
+```
+
+审计输出：
+
+```text
+agree
+partial
+disagree
+uncertain
+```
+
+以及：
+
+- 一致 / 分歧原因
+- 人工分析证据
+- 自动回复证据
+- 人工标注可能存在的问题
+
+该统计被称为：
+
+> Qualitative Annotation Audit
+
+而不是：
+
+> Accuracy
+
+---
+
+### 7.2 Evidence Provenance Verification
+
+审计同时检查：
+
+```text
+human_evidence
+reply_evidence
+```
+
+是否能够逐字追溯到：
+
+```text
+annotator_notes
+auto_reply
+```
+
+记录：
+
+```text
+human_evidence_verified
+reply_evidence_verified
+evidence_verified
+```
+
+如果模型对原文进行了轻微改写：
+
+```text
+审计结论仍然保留
++
+evidence_verified = false
++
+记录 warning
+```
+
+不会因为引文不完全匹配而直接丢弃整个审计结果。
+
+这样可以将：
+
+```text
+审计结论
+```
+
+和：
+
+```text
+证据来源可靠性
+```
+
+分开处理。
+
+---
+
+## 8. Mock Mode
+
+项目同时支持：
+
+```bash
+python main.py --mode mock
+```
+
+Mock 模式：
+
+- 不调用任何 LLM API
+- 不读取人工分析生成得分
+- 不根据 case ID 查答案
+- 不使用随机数
+- 使用确定性规则
+- 相同输入得到相同结果
+
+Mock 主要用于：
+
+- 本地开发
+- 流水线测试
+- 无 API Key 环境演示
+- CI 测试
+
+Mock 规则包括：
+
+- 回复长度
+- 追问词
+- 协助词
+- 安抚词
+- 明显流程冲突
+- 部分风险短语
+
+但：
+
+> Mock 未发现问题，不代表事实一定正确。
+
+因此 Mock 结果不能用于判断真实上线质量。
+
+Mock 模式不执行语义人工审计：
+
+```text
+status = not_assessed
+```
+
+不会伪造人工一致率。
+
+---
+
+## 9. Quick Start
+
+### 9.1 创建虚拟环境
+
+```bash
+python3 -m venv .venv
+```
+
+Linux / macOS：
+
+```bash
+source .venv/bin/activate
+```
+
+Windows PowerShell：
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+安装依赖：
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 9.2 Mock 模式
+
+无需 API Key：
+
+```bash
+python main.py --mode mock
+```
+
+---
+
+### 9.3 配置 DeepSeek API
+
+首次使用：
+
+```bash
+cp .env.example .env
+```
+
+配置：
+
+```dotenv
+DEEPSEEK_API_KEY=your_api_key_here
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-chat
+```
+
+`.env` 已加入 `.gitignore`。
+
+源码、输出结果以及 Git 仓库均不保存 API Key。
+
+---
+
+### 9.4 API Smoke Test
+
+先测试少量样本：
+
+```bash
+python main.py --mode api --limit 3
+```
+
+也可以单独保存：
+
+```bash
+python main.py --mode api --limit 3 --output-dir outputs/api_smoke
+```
+
+---
+
+### 9.5 完整 API 评估
+
+```bash
+python main.py --mode api
+```
+
+每个 case：
+
+```text
+1 次正式评分
++
+1 次人工文字审计
+```
+
+20 条正常情况下约需要 40 次请求。
+
+若发生重试，请求次数会相应增加。
+
+---
+
+## 10. Final Results
+
+以下结果来自最终实际运行：
+
+```bash
+python main.py --mode api
+```
+
+全部 20 条样本均使用 DeepSeek LLM-as-a-Judge 进行正式评估。
+
+| 统计 | 最终结果 |
+|---|---:|
+| 样本总数 | 20 |
+| 成功 | 20 |
+| 失败 | 0 |
+| 平均总分 | **3.90 / 5** |
+| 中位数 | **3.90 / 5** |
+| 百分制均分 | **77.90 / 100** |
+| 最高分 | **4.75** |
+| 最低分 | **2.65** |
+| Correctness | **4.15** |
+| Relevance | **4.10** |
+| Completeness | **3.50** |
+| Clarity | **4.90** |
+| Service | **3.35** |
+| 人工文字标注定性审计 | **20 / 20** |
+| 审计证据来源核验 | **20 / 20** |
+
+---
+
+### 10.1 Lowest 3 Cases
+
+最终最低三条：
+
+```text
+case_11：2.65
+case_13：3.50
+case_19：3.50
+```
+
+这些样本具有一个较明显的共同特征：
+
+> 回复给出了通用说明，但没有针对用户当前具体商品、订单、场景或困难进一步推进问题解决。
+
+这也与整体指标表现一致：
+
+```text
+Clarity      4.90
+Correctness  4.15
+Relevance    4.10
+
+Completeness 3.50
+Service      3.35
+```
+
+即：
+
+> 自动回复整体语言清晰、基础事实和主题相关性较好，但在主动协助、场景针对性、有效追问和明确下一步方面相对较弱。
+
+---
+
+## 11. Visualization
+
+### Metric Distribution
+
+![Metric Distribution](outputs/metric_distribution.png)
+
+### Overall Scores
+
+![Overall Scores](outputs/overall_scores.png)
+
+### Human Validation
+
+![Human Validation Coverage](outputs/validation.png)
+
+---
+
+## 12. Output Artifacts
+
+| 文件 | 内容 |
+|---|---|
+| `evaluation_results.json` | 逐条得分、理由、错误、调用 trace |
+| `evaluation_results.csv` | 展平后的评分与理由 |
+| `summary.json` | 总体统计、指标均值、Lowest 3 |
+| `validation_results.json` | 人工参考、定性审计、证据核验 |
+| `run_metadata.json` | 模式、Rubric、Prompt 与数据哈希等 |
+| `report.md` | 完整自动评估报告 |
+| `metric_distribution.png` | 各指标表现 |
+| `overall_scores.png` | 20 条样本总分 |
+| `validation.png` | 人工审计覆盖情况 |
+| `checkpoint.json` | 中间 checkpoint，默认 Git 忽略 |
+
+完整自动报告：
+
+[查看评估报告](outputs/report.md)
+
+---
+
+## 13. Screenshots
+
+### Development
+
+开发过程中使用 IDE / Codex 辅助项目结构、代码实现、Prompt 调整和测试。
+
+![Development](screenshots/development.png)
+
+### API Evaluation
+
+最终 20 条真实 API 运行：
+
+![API Evaluation](screenshots/api_run.png)
+
+### Tests
+
+全部自动测试通过：
+
+![Tests](screenshots/tests.png)
+
+---
+
+## 14. Tests
+
+运行：
+
+```bash
+pytest -q
+```
+
+最终结果：
+
+```text
+29 passed
+```
+
+测试覆盖：
+
+- JSON 正常输出
+- JSON 包装及损坏响应
+- 多 JSON 对象歧义
+- 数字字符串转换
+- score 上下界
+- NaN / Infinity
+- 权重计算
+- Lowest 3 排序
+- 数据字段关联
+- 重复 ID
+- 缺失参考
+- 确定性 Mock
+- Audit 状态解析
+- Evidence Verification
+- API 重试
+- API 错误隔离
+- Key 缺失退出
+- 单条失败后继续执行
+- 全部失败仍生成报告
+- OpenAI-compatible SDK 请求流程
+
+测试过程不需要真实 DeepSeek API。
+
+---
+
+## 15. Limitations
+
+### 15.1 LLM Judge Bias
+
+LLM Judge 的评分会受到：
+
+- 模型版本
+- Prompt
+- temperature
+- 上下文
+- 评价顺序
+
+影响。
+
+即使：
+
+```text
+temperature = 0
+```
+
+也不能保证不同 API 调用绝对一致。
+
+改进方式：
+
+- 重复评估取均值
+- Multi-Judge
+- Judge voting
+- 定期稳定性测试
+
+---
+
+### 15.2 Reference Answer Is Not Unique
+
+客服问题通常存在多个合法回答方式。
+
+因此：
+
+> 自动回复与参考答案措辞不同，不意味着质量差。
+
+本项目按：
+
+```text
+语义
+事实
+可操作性
+服务质量
+```
+
+进行评价，而不是字符串相似度。
+
+---
+
+### 15.3 External Fact Evidence Is Limited
+
+当前数据没有提供完整：
+
+- 企业政策库
+- 商品数据库
+- 订单数据库
+- 物流状态
+- 客服工具权限
+
+部分事实无法独立核实。
+
+例如：
+
+```text
+质保时间
+补偿金额
+库存状态
+物流进度
+提醒功能
+```
+
+后续可通过：
+
+```text
+Enterprise Knowledge Base
++
+RAG
++
+Tool Capability Metadata
+```
+
+实现 Evidence-Grounded Evaluation。
+
+---
+
+### 15.4 Subjective Metric Weights
+
+当前：
+
+```text
+Correctness   30%
+Relevance     15%
+Completeness  25%
+Clarity       10%
+Service       20%
+```
+
+体现当前客服业务风险假设，并非统计意义上的最优权重。
+
+后续应结合：
+
+- 用户满意度
+- 投诉率
+- 人工质检
+- 业务转化
+- 实际问题解决率
+
+进行校准。
+
+---
+
+### 15.5 Small Dataset
+
+当前只有：
+
+```text
+20 cases
+```
+
+不能代表真实线上流量。
+
+需要进一步：
+
+- 扩充数据集
+- 按问题类型分层
+- 增加困难案例
+- 增加边界案例
+- 构建长期 Regression Evaluation Dataset
+
+---
+
+### 15.6 Validation Is Qualitative
+
+当前人工标注只有文字分析，没有独立的数值评分或二元标签。
+
+因此当前：
+
+```text
+20/20 annotation audit
+```
+
+不能理解为：
+
+```text
+Accuracy = 100%
+```
+
+它只表示：
+
+> 20 条样本均完成了自动评分与人工文字分析之间的定性一致性审计。
+
+同一模型参与评分和审计仍可能存在自我偏好。
+
+真正的效度验证需要：
+
+- 独立人工评分
+- 双人标注
+- 分歧裁决
+- 保留测试集
+
+---
+
+### 15.7 Engineering Scope
+
+当前流水线采用串行 API 请求，没有：
+
+- 数据库
+- 分布式任务队列
+- 自动断点续跑
+- 并发限流
+- API 成本控制
+- 在线 Dashboard
+
+虽然每条都会保存 checkpoint，但任务中断后仍需要人工重新启动。
+
+当前 20 条数据已经完成真实 DeepSeek API 验证。
+
+如果扩展到大规模线上数据，应进一步增加：
+
+- Async / Concurrent Evaluation
+- Rate Limiting
+- Retry Queue
+- Resume
+- Cache
+- Cost Monitoring
+- Evaluation Dashboard
+
+---
+
+## 16. Future Improvements
+
+后续优先方向：
+
+### 1. 独立人工 Gold Set
+
+建立：
+
+```text
+双人独立评分
+→ 分歧裁决
+→ Gold Evaluation Dataset
+```
+
+再计算：
+
+- Pearson
+- Spearman
+- MAE
+- Accuracy
+- Precision
+- Recall
+- F1
+
+---
+
+### 2. Evidence-Grounded Judge
+
+增加企业知识库：
+
+```text
+Reply
++
+Retrieved Evidence
++
+Rubric
+→
+Judge
+```
+
+避免只依赖 reference 或模型自身知识。
+
+---
+
+### 3. Multi-Judge
+
+不同模型独立评分：
+
+```text
+Judge A
+Judge B
+Judge C
+```
+
+再通过：
+
+```text
+平均
+多数投票
+置信区间
+```
+
+降低单模型偏差。
+
+---
+
+### 4. Regression Evaluation
+
+建立固定评测集：
+
+```text
+模型 / Prompt 更新
+        ↓
+自动执行 Evaluation
+        ↓
+和历史版本比较
+        ↓
+发现质量退化
+```
+
+可进一步接入 CI。
+
+---
+
+### 5. Online Monitoring
+
+未来可加入：
+
+- 线上抽样
+- 每日质量趋势
+- 不同问题类型分层指标
+- Judge 漂移监控
+- 自动报警
+
+---
+
+## 17. AI Tools Usage
+
+本项目开发过程中使用 Codex 辅助：
+
+- 项目结构设计
+- Python 代码实现
+- Prompt 调整
+- Rubric 校准
+- 测试编写
+- README 整理
+- 代码检查
+
+使用 DeepSeek API 作为正式 LLM-as-a-Judge。
+
+最终 20 条评分结果均来自真实 API 运行，而不是预设结果或人工修改分数。
+
+**人工检查状态：已完成。**
+
+提交前已人工复核：
+
+- 指标设计
+- 评分权重
+- 代表性高低分案例
+- 人工参考中的事实边界
+- Judge 校准效果
+- 最低样本分析
+- 最终 API 运行结果
+
+个别边界样本仍可能受到 LLM Judge 主观性和 Prompt 敏感性影响，相关风险已在 Limitations 中说明。
+
+---
+
+## 18. Final Run Summary
+
+最终 API 运行：
+
+```text
+Cases: 20
+Successful: 20
+Failed: 0
+
+Average: 3.90 / 5
+Median: 3.90 / 5
+Score: 77.90 / 100
+
+Correctness:   4.15
+Relevance:     4.10
+Completeness:  3.50
+Clarity:       4.90
+Service:       3.35
+
+Lowest 3:
+1. case_11  2.65
+2. case_13  3.50
+3. case_19  3.50
+
+Human annotation audit: 20/20
+Audit evidence verified: 20/20
+```
+
+自动测试：
+
+```text
+29 passed
+```
+
+---
+
+## 19. Repository Purpose
+
+本项目重点不是单纯调用 LLM 评分，而是展示完整的：
+
+```text
+模糊业务要求
+        ↓
+可量化 Evaluation Rubric
+        ↓
+LLM-as-a-Judge
+        ↓
+Structured Output
+        ↓
+Local Weighted Score
+        ↓
+Human Annotation Audit
+        ↓
+Evidence Verification
+        ↓
+Error Analysis
+        ↓
+Visualization & Report
+```
+
+即：
+
+> 将模糊的客服质量要求转化为一套可执行、可解释、可验证的 LLM Evaluation Pipeline。
