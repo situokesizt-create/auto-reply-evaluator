@@ -1,0 +1,226 @@
+{
+  "total": 20,
+  "successful": 20,
+  "failed": 0,
+  "metrics": {
+    "correctness": {
+      "average": 4.15,
+      "min": 3.0,
+      "max": 5.0,
+      "distribution": [
+        0,
+        0,
+        0,
+        1,
+        15,
+        4
+      ]
+    },
+    "relevance": {
+      "average": 4.1,
+      "min": 3.0,
+      "max": 5.0,
+      "distribution": [
+        0,
+        0,
+        0,
+        4,
+        10,
+        6
+      ]
+    },
+    "completeness": {
+      "average": 3.5,
+      "min": 2.0,
+      "max": 4.0,
+      "distribution": [
+        0,
+        0,
+        1,
+        8,
+        11,
+        0
+      ]
+    },
+    "clarity": {
+      "average": 4.9,
+      "min": 4.0,
+      "max": 5.0,
+      "distribution": [
+        0,
+        0,
+        0,
+        0,
+        2,
+        18
+      ]
+    },
+    "service": {
+      "average": 3.35,
+      "min": 2.0,
+      "max": 5.0,
+      "distribution": [
+        0,
+        0,
+        1,
+        12,
+        6,
+        1
+      ]
+    }
+  },
+  "lowest": [
+    {
+      "id": "case_11",
+      "mode": "api",
+      "question": "买了两件衣服一件大了一件小了想换尺码",
+      "auto_reply": "您好，换货需要先退货再重新下单选择正确尺码。请分别发起两件商品的换货申请，按照退货地址寄回原商品，我们收到后会发出新尺码的商品。换货运费由买家承担。",
+      "input_sha256": "80ce98c86482f1b978e35d332f1ed71c17c861bad651c8de3a1b2fe71052471c",
+      "scores": {
+        "correctness": 3.0,
+        "relevance": 3.0,
+        "completeness": 2.0,
+        "clarity": 4.0,
+        "service": 2.0
+      },
+      "reasons": {
+        "correctness": "回复中“换货需要先退货再重新下单”与人工参考回复中“帮您分别发起换货申请”的流程不一致，存在事实偏差；但“换货运费由买家承担”在无独立证据下无法核实，且未编造订单状态或补偿承诺，整体部分准确但有信息偏差。",
+        "relevance": "回复围绕换货主题，但未回应用户“两件衣服分别换尺码”的具体诉求，也未询问具体商品和尺码，仅提供通用流程，属于只回答部分诉求。",
+        "completeness": "缺少对具体商品、目标尺码的必要追问，也未提供换货申请的具体操作入口或下一步指引，用户难以直接执行，仅覆盖极少部分必要信息。",
+        "clarity": "语言清晰简洁，步骤表述明确，无歧义或自相矛盾，整体可理解。",
+        "service": "语气礼貌但模板化，未识别用户换尺码的具体场景，未主动询问商品和尺码以协助发起换货，主动协助不足。"
+      },
+      "overall_score": 2.65,
+      "score_100": 53.0,
+      "overall_reason": "回复主题相关且表达清晰，但未针对用户两件衣服分别换尺码的具体诉求进行追问，且换货流程描述与参考回复存在偏差，可操作性不足，服务主动性较弱。",
+      "improvement": "建议先询问具体是哪两件商品及分别要换的尺码，再说明换货申请的具体操作路径（如订单页申请换货），并确认换货运费承担规则，避免直接给出与参考流程不一致的“先退货再重新下单”表述。",
+      "warnings": [],
+      "error": null,
+      "trace": {
+        "task": "Scoring",
+        "attempts": 1,
+        "usage": [
+          {
+            "completion_tokens": 419,
+            "prompt_tokens": 2050,
+            "total_tokens": 2469,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cache_write_tokens": null,
+              "cached_tokens": 1664
+            },
+            "prompt_cache_hit_tokens": 1664,
+            "prompt_cache_miss_tokens": 386
+          }
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ]
+      }
+    },
+    {
+      "id": "case_13",
+      "mode": "api",
+      "question": "我买的面膜成分表能发给我看看吗我皮肤敏感",
+      "auto_reply": "您好，面膜的成分表可以在商品详情页查看。如果您对特定成分过敏，建议您在购买前仔细核对成分表，或先购买小样进行皮肤测试。如需更详细的成分信息，可以联系品牌官方客服。",
+      "input_sha256": "3e81b5097bb3263231374cc727ac358df4137387acd2a85fff5962df36ecfd51",
+      "scores": {
+        "correctness": 4.0,
+        "relevance": 3.0,
+        "completeness": 3.0,
+        "clarity": 5.0,
+        "service": 3.0
+      },
+      "reasons": {
+        "correctness": "回复中关于成分表可在商品详情页查看、建议核对成分或购买小样测试、可联系品牌官方客服获取更详细信息等说法，与人工参考回复中提供成分信息、建议过敏确认的方向一致，未发现事实错误或编造。但未提供具体成分信息，且未独立验证商品详情页是否确实包含完整成分表，存在轻微依据不足。",
+        "relevance": "用户明确要求发送成分表并说明皮肤敏感，实际诉求是获取具体成分信息以判断是否适用。自动回复仅指引用户自行查看详情页或联系品牌客服，未直接提供成分表或针对敏感肌给出具体成分确认，属于部分回应诉求，但未满足核心需求。",
+        "completeness": "回复提供了查看成分表的自助路径和过敏测试建议，但未提供用户所问的具体成分信息，也未追问具体商品或过敏成分以进一步协助，缺少关键信息，下一步操作不够直接。",
+        "clarity": "语言清晰简洁，结构合理，无歧义或自相矛盾，专业自然。",
+        "service": "语气礼貌，但较为模板化，未针对用户皮肤敏感的焦虑提供具体协助或主动承担查询责任，仅将用户引导至其他渠道，主动服务意识不足。"
+      },
+      "overall_score": 3.5,
+      "score_100": 70.0,
+      "overall_reason": "回复在表达清晰度和基本事实准确性上表现较好，但未能直接满足用户获取具体成分表的核心诉求，仅提供通用自助指引，且服务主动性不足，未针对敏感肌场景提供进一步帮助。",
+      "improvement": "建议自动回复在无法直接提供成分表时，主动询问用户具体商品或过敏成分，并尝试从知识库中调取该商品的成分信息；若无法调取，应明确说明并给出更具体的替代方案，如提供品牌客服联系方式或引导用户提供订单信息以便进一步协助。",
+      "warnings": [],
+      "error": null,
+      "trace": {
+        "task": "Scoring",
+        "attempts": 1,
+        "usage": [
+          {
+            "completion_tokens": 468,
+            "prompt_tokens": 2058,
+            "total_tokens": 2526,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cache_write_tokens": null,
+              "cached_tokens": 1664
+            },
+            "prompt_cache_hit_tokens": 1664,
+            "prompt_cache_miss_tokens": 394
+          }
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ]
+      }
+    },
+    {
+      "id": "case_19",
+      "mode": "api",
+      "question": "我要买的那个包什么时候补货",
+      "auto_reply": "您好，商品补货时间不固定，建议您关注商品页面或联系客服询问预计到货时间。您也可以将商品加入购物车，补货时系统会自动提醒您。如果长时间未补货，可以考虑查看类似的替代商品。",
+      "input_sha256": "f1eb4a35537a9487fe7d94abb5f391c295607955cff8f2bd61505c5bcc443a4d",
+      "scores": {
+        "correctness": 4.0,
+        "relevance": 3.0,
+        "completeness": 3.0,
+        "clarity": 5.0,
+        "service": 3.0
+      },
+      "reasons": {
+        "correctness": "回复中关于补货时间不固定、可关注商品页面、加入购物车后系统自动提醒、可查看替代商品等说法，与人工参考回复中“设到货提醒”的思路一致，未发现事实错误或编造。但“联系客服询问预计到货时间”属于对客服能力的泛化描述，缺乏独立证据支持，存在轻微不严谨。",
+        "relevance": "回复围绕补货主题，但用户问的是“我要买的那个包什么时候补货”，实际诉求是获取具体补货时间或得到查询帮助。回复未询问是哪款包，也未提供查询补货时间的路径，仅给出通用建议，未真正回应用户对具体商品补货时间的诉求。",
+        "completeness": "回复提供了关注页面、加入购物车提醒、查看替代商品等自助路径，有一定可操作性。但缺少关键追问（哪款包），也未说明如何联系客服查询预计到货时间，用户无法据此获得具体补货信息，必要信息不完整。",
+        "clarity": "语言清晰简洁，结构合理，无歧义或自相矛盾，用户可轻松理解。",
+        "service": "语气礼貌，提供了自助建议，但未主动询问具体商品以帮助查询补货时间，也未表达可协助设置提醒或跟进，服务意识较为模板化，主动协助不足。"
+      },
+      "overall_score": 3.5,
+      "score_100": 70.0,
+      "overall_reason": "回复主题相关、表达清晰，提供了关注页面、购物车提醒等自助路径，但未回应用户对具体商品补货时间的核心诉求，缺少必要追问和主动协助，整体可用但改进空间明显。",
+      "improvement": "建议先追问用户具体是哪款包，然后说明可协助查询补货时间或设置到货提醒，并给出明确的下一步操作指引，如“请提供商品链接或名称，我帮您查询预计到货时间并设置提醒”。",
+      "warnings": [],
+      "error": null,
+      "trace": {
+        "task": "Scoring",
+        "attempts": 1,
+        "usage": [
+          {
+            "completion_tokens": 478,
+            "prompt_tokens": 2054,
+            "total_tokens": 2532,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cache_write_tokens": null,
+              "cached_tokens": 1664
+            },
+            "prompt_cache_hit_tokens": 1664,
+            "prompt_cache_miss_tokens": 390
+          }
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ]
+      }
+    }
+  ],
+  "average": 3.895,
+  "median": 3.9,
+  "best": 4.75,
+  "worst": 2.65,
+  "score_100": 77.9
+}

@@ -1,0 +1,40 @@
+{
+  "mock_run": {
+    "exit_code": 0,
+    "command": "python main.py --mode mock"
+  },
+  "test_run": {
+    "exit_code": 0,
+    "command": "python -m pytest -q"
+  },
+  "source_integrity": [
+    {
+      "filename": "auto_replies.json",
+      "sha256": "7d431d59ef68c38181d7aeb03cb49c043c73e3fc4de6b325b7f24311c8077daf",
+      "identical_to_original": true
+    },
+    {
+      "filename": "human_ref.json",
+      "sha256": "5995bf08b7fcb7aa47450e1a5cae22302677ee2ab74eb862fe62936b089f3c77",
+      "identical_to_original": true
+    },
+    {
+      "filename": "eval_criteria.md",
+      "sha256": "7a837a007112edbd70cd11966ededcd13bcfb00385b6475e32bc20ec77ab39a1",
+      "identical_to_original": true
+    }
+  ],
+  "artifacts": {
+    "evaluation_results.json": 33230,
+    "evaluation_results.csv": 22011,
+    "report.md": 10695,
+    "metric_distribution.png": 107462,
+    "overall_scores.png": 70817,
+    "validation.png": 49200,
+    "validation_results.json": 12247,
+    "run_metadata.json": 3493,
+    "summary.json": 6279
+  },
+  "real_api_run": "not performed: API key not configured",
+  "human_review": "pending submitter review"
+}
